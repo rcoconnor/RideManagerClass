@@ -1,11 +1,9 @@
 const Driver = require("../classes/Driver.js"); 
 const Rider = require("../classes/Rider.js"); 
 
-/** @class 
- * Manages all the asssignments between rider requests and drivers */ 
+/** Manages all the asssignments between rider requests and drivers */ 
 class RideManager {
-    /** @constructor
-     * represents the class mediating between the rider requests and the
+    /** represents the class mediating between the rider requests and the
      * drivers */
     constructor() {
         console.log("RideManager constructor called"); 
@@ -22,8 +20,7 @@ class RideManager {
         this.deleteQueue = this.deleteQueue.bind(this);  
     }
     
-    /** @function
-     * creates a list of the riders, both currently riding and waiting,
+    /** creates a list of the riders, both currently riding and waiting,
      * assigned to the driver specified by driverName
      * @param {string} driverName - the name of the driver whose riders we are
      * interested in
@@ -40,10 +37,12 @@ class RideManager {
         return obj; 
     }
 
-    /** @function
-     * adds a driver from a sent http message 
+    /** adds a driver from a sent http message 
      * @param {Object} req - the http request, contains req.body.name, the 
-     * drivers name to be added to the drivers list */
+     * drivers name to be added to the drivers list 
+     * @param {string} req.body.name - the name of the driver to add 
+     * @param {string} req.body.capacity - the capacity of the driver (not
+     * actually implemented yet, defaults to 4) */
     addDriver(req) {
         // FIXME: Allow Driver to have a capacity  in consrtuctor 
         console.log("adding driver"); 
@@ -51,8 +50,7 @@ class RideManager {
         this.drivers.push(driver); 
     } 
     
-    /** @function
-     * returns a JSON object containing all of the drivers 
+    /** returns a JSON object containing all of the drivers 
      * @return {Object[]} a JSON object containing all of the drivers */ 
     listDrivers() {
         var listToReturn = []; 
@@ -65,28 +63,11 @@ class RideManager {
     }
     
 
-/*    getAllRidersWaitingForDriver() {
-        console.log("----------------WHY IS THIS BEING CALLED-------------------")
-        console.log("      ")
-        console.log("      ")
-        console.log("      ")
-        console.log("      ")
-        console.log("      ")
-        console.log("      ")
-        console.log("      ")
-        console.log("      ")
-        var theQueue = [];
-
-        this.drivers[index].pickupRider(riderName); 
-        
-    }*/
-
-    /** @function 
-     * finds the index of the driver in the driver list specified by
+    /** finds the index of the driver in the driver list specified by
      * driverName
      * @param {string} driverName - the name of the driver whose index we are
      * looking for 
-     * @returns the index of the driver if it exists, -1 otherwise */
+     * @return the index of the driver if it exists, -1 otherwise */
     findDriverIndex(driverName) {
         console.log("find driver index called");
         console.log()
@@ -100,10 +81,17 @@ class RideManager {
         return -1; 
     }
 
-    /** @function 
-     * creates a new pickup requiest by creating a new rider and assigning
+    /** creates a new pickup by creating a new rider and assigning
      * that to a driver 
-     * @param {Object} req - the object representing the HTTP request*/
+     * @param {Object} req - the object representing the HTTP request
+     * @param {string} req.body.name - the name of the rider requesting the
+     * ride 
+     * @param {number} req.body.numPassengers - the total number of passengers
+     * the request is for
+     * @param {number} req.body.latitude - the latitude of the requested
+     * pickup location
+     * @param {number} req.body.longitude - the longitude of the requested
+     * pickup location */
     createPickupRequest(req) {
         // FIXME: allow rider to enter capacity on front-end
         console.log("createPickupRequest() called"); 
@@ -136,8 +124,7 @@ class RideManager {
         this.drivers[minIndex].waitingRiders.push(newRider);  
     }
 
-    /** @function
-     * Pickups up the rider specified by riderName and the driver specified by
+    /** Pickups up the rider specified by riderName and the driver specified by
      * driverName
      * @param {string} driverName - the name of the driver who is picking up
      * the rider 
@@ -148,16 +135,14 @@ class RideManager {
         this.drivers[index].pickupRider(riderName); 
     }
     
-    /** @function 
-     * deletes all of the drivers within the driver list 
+    /** deletes all of the drivers within the driver list 
      * also deletes all of the riders as well */
     deleteQueue() {
         console.log("DELETING ALL DRIVERS AND WAIIING RIDES"); 
         this.drivers = []; 
     }
 
-    /** @function
-     * drops off the rider specified by riderName who is assigned to the driver
+    /** drops off the rider specified by riderName who is assigned to the driver
      * specified by driverName
      * @param {string} driverName - the name of the driver who our rider is
      * assigned to 

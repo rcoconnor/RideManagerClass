@@ -1,12 +1,10 @@
 
 
 
-/** @class 
- * Driver class, represents a driver */
+/** Driver class, represents a driver */
 class Driver {
 
-    /** @constructor  
-     * represents the driver class *
+    /** represents the driver class 
      * @param {string} driver_name - the name of the driver we are creating
      * @param {number} cap - the capacity of the driver we are creating */
     constructor(driver_name, cap) {
@@ -25,8 +23,7 @@ class Driver {
     }
    
 
-    /** @private @function 
-     * private helper function for getting the index of a rider within a list
+    /** private helper function for getting the index of a rider within a list
      * with the specified name
      * @param {string} name - the name of the rider we are looking for 
      * @param {Object[]} arr - the array we are searching through to find the rider 
@@ -46,8 +43,7 @@ class Driver {
     } 
     
 
-    /** @function 
-     * adds a new rider to this.waitingRiders 
+    /** adds a new rider to this.waitingRiders 
      * @param {string} riderName - the name of the rider we are creatin a new
      * pickup request for 
      * @param {number} lat - the latitude of the rider we are picking up 
@@ -61,8 +57,7 @@ class Driver {
         this.waitingRiders.push(newEntry); 
     }
    
-    /** @function
-     * drops off the rider by removing it from the list of current riders
+    /** drops off the rider by removing it from the list of current riders
      * @param {string} name - the name of the driver we are dropping off */
     dropOffRider(name) {
         //console.log("dropOffRider called"); 
@@ -75,9 +70,8 @@ class Driver {
         }
     }
 
-    /** @function
-     * moves the rider from waiting riders to currentRiders 
-     * @param {string} the name of the rider we are going to pick up */
+    /** moves the rider from waiting riders to currentRiders 
+     * @param {string} name -  the name of the rider we are going to pick up */
     pickupRider(name) {
         //console.log("pickup rider called");
         var index = this.getIndexOfRider(name, this.waitingRiders);  
@@ -91,7 +85,6 @@ class Driver {
             // FIXME: handle if the rider doesn't exist in the list 
             console.log("error: index returned -1"); 
         } 
-         
     }
 }
 
