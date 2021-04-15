@@ -22,7 +22,7 @@ a route, which will call the function everytime it is called.
 an example route: 
 
 ```javascript
-router.get('/list', functino(req, res, next){
+router.get('/list', function(req, res, next){
     var list = rideManager.listDrivers() 
     res.send(JSON.stringify(list)); 
 });
