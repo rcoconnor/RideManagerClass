@@ -1,6 +1,8 @@
 const Driver = require("../classes/Driver.js"); 
 const Rider = require("../classes/Rider.js"); 
 
+const fs = require('fs');
+
 /** Manages all the asssignments between rider requests and drivers */ 
 class RideManager {
     /** represents the class mediating between the rider requests and the
@@ -17,7 +19,10 @@ class RideManager {
         this.pickupRider = this.pickupRider.bind(this); 
         this.dropOffRider = this.dropOffRider.bind(this);  
         this.listRidersAssignedToDriver = this.listRidersAssignedToDriver.bind(this);  
-        this.deleteQueue = this.deleteQueue.bind(this);  
+        this.deleteQueue = this.deleteQueue.bind(this);
+        this.isExistingDriver = this.isExistingDriver.bind(this);
+        this.updateDriver = this.updateDriver.bind(this);
+        this.writeToFile = this.writeToFile.bind(this);
     }
     
     /** creates a list of the riders, both currently riding and waiting,
@@ -153,5 +158,117 @@ class RideManager {
         var index = this.findDriverIndex(driverName); 
         this.drivers[index].dropOffRider(riderName); 
     }; 
+
+    /**
+     * This function checks if the driver's Google subject already exists in drivers.json database file
+     * returns true if driver already exists, false if driver is not already in the database file
+     *
+     * @param {string} userID - the ID representing sub in the databse file
+     *
+     * @return {boolean} returns true if rider is found, false if not
+     */
+    isExistingDriver(userID) {
+        console.log("Looking for " + userID);
+        if (!fs.existsSync("./drivers.json")) {
+            console.log("Database file does not yet exist");
+            return false;
+        }
+        var data = fs.readFileSync('./drivers.json', 'utf8');
+        // parse JSON string from file to JSON object
+        const drivers = JSON.parse(data);
+        var found = false;
+        drivers.forEach(db => {
+            if (db.sub == userID) {
+                // console.log(`${db.sub}:` + userID);
+                found = true;
+            }
+        });
+        return found;
+    }
+
+    /**
+     * This function writes new information to the drivers.json database file, it creates the file if it does not already exist
+     * 
+     * @param {string} payload - the new json driver object to write to the file
+     */
+    writeToFile(payload) {
+        if (!fs.existsSync("./drivers.json")) {
+            let drivers = [];
+            drivers.push(payload);
+            fs.writeFile("./drivers.json", JSON.stringify(drivers, null, 4), 'utf8', function(err){
+                if (err) return console.log("Error creating file: " + err);
+                console.log("File created");
+            });
+        } else {
+            fs.readFile('./drivers.json', 'utf8', (err, data) => {
+                if (err) {
+                    console.log(`Error reading file from disk: ${err}`);
+                } else {
+                    // parse JSON string to JSON object
+                    const drivers = JSON.parse(data);
+                    drivers.push(payload);
+                    fs.writeFile('./drivers.json', JSON.stringify(drivers, null, 4), (err) => {
+                        if (err) return console.log("Error updating file: " + err);
+                        console.log("File updated");
+                    });
+                }
+            });
+        }
+    }
+
+    /**
+     * This function updates existing entries in the drivers.json file when new information is sent
+     * Returns true for success, false if subject does not exist in file
+     *      
+     * @param {string} subject  - the subject string to search for in the drivers.json file
+     * @param {int}    capactiy - the new capacity that has been set
+     *
+     * @return {boolean} returns true if the driver exists and was updated, false if driver does not exist
+     */
+    updateDriver(subject, capacity) {
+        console.log("looking for " + subject + " to change capacity to " + capacity);
+        if (!fs.existsSync("./drivers.json")) return console.log("File does not exist yet");
+        var data = fs.readFileSync('./drivers.json', 'utf8');
+        // parse JSON string from file to JSON object
+        const drivers = JSON.parse(data);
+        var found = false;
+        drivers.forEach(db => {
+            if (db.sub == subject) {
+                found = true;
+                console.log(`${db.name}: ${db.carCapacity}`);
+                db.carCapacity = capacity;
+                console.log("--------CHANGED TO---------");
+                console.log(`${db.name}: ${db.carCapacity}`);
+
+                fs.writeFile('./drivers.json', JSON.stringify(drivers, null, 4), (err) => {
+                    if (err) return console.log("Error updating file: " + err);
+                    console.log("Existing driver updated");
+                });
+            }
+        });
+        if (found == false) {
+            return console.log("Something went wrong, driver not found");
+        }
+    }
+
+    /**
+     * This function returns a driver's capacity from the drivers.json database file
+     *      
+     * @param {string} driverName - the name of the driver for which to return the capacity
+     *
+     * @return {int} the car capacity for the given driver
+     */
+    getDriverCapacity(userid) {
+        var data = fs.readFileSync('./drivers.json', 'utf8');
+        const drivers = JSON.parse(data);
+
+        var capacity = 0;
+        drivers.forEach(db => {
+            if (db.sub == userid) {
+                capacity = db.carCapacity;
+            }
+        });
+        return capacity;
+    }
 
 } module.exports = RideManager; 
